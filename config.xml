@@ -12,12 +12,20 @@
     </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
   </actions>
   <description></description>
+  <displayName>Poll SCM and email notifications</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.37.0">
-      <projectUrl>https://github.com/Shikhambryshikha/Jenkinsdemo/</projectUrl>
-      <displayName></displayName>
-    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.37.0">
+          <spec></spec>
+        </com.cloudbees.jenkins.GitHubPushTrigger>
+        <hudson.triggers.SCMTrigger>
+          <spec>H/5 * * * *</spec>
+          <ignorePostCommitHooks>false</ignorePostCommitHooks>
+        </hudson.triggers.SCMTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3659.v582dc37621d8">
     <script>pipeline {
@@ -41,34 +49,51 @@
                echo&apos;fetch the source code from the directory path specified by the environment variable&apos;
                 git url: &quot;https://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@github.com/Shikhambryshikha/Jenkinsdemo.git&quot;,branch: &apos;main&apos;
                 echo&apos;compile the code and generate any necessary artifacts&apos;
-
-
             }
         }
-        stage(&apos;Test&apos;){
+        stage(&apos;Unit and Integration Tests&apos;){
             steps {
                 print(&quot;Unit Tests\n&quot;)
                 print(&quot;Integration Tests\n&quot;)
             }
+            post{
+            always{
+            mail to: &quot;sc9967856@gmail.com&quot;,
+            subject: &quot;Confirmation Email&quot;,
+            body: &quot;Tests have been successful&quot;
         }
-        stage(&apos;CodeQualityCheck&apos;){
+    }
+        }
+        stage(&apos;Code Analysis&apos;){
             steps {
                 echo &apos;check the quality of the code&apos;
             }
         }
-        stage(&apos;Deploy&apos;) {
+        stage(&apos;Security Scan&apos;) {
             steps {
                 echo &apos;deploy the application to a testing environment specified by the environment variable&apos;
             }
+            post{
+            always{
+            mail to: &quot;sc9967856@gmail.com&quot;,
+            subject: &quot;Confirmation Email&quot;,
+            body: &quot;Security Scan has been successful&quot;
         }
-        stage(&apos;Approval&apos;){
+    }
+        }
+        stage(&apos;Deploy to Staging&apos;){
             steps {
                 sleep 10
             }
         }
-        stage(&apos;Deploy To Production&apos;){
+        stage(&apos;Integration Tests on Staging&apos;){
             steps {
               bat &quot;git push origin main&quot;
+            }
+        }
+        stage(&apos;Deploy to Production&apos;){
+            steps {
+                echo &quot;Deploy to production&quot;
             }
         }
     }
