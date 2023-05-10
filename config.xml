@@ -1,0 +1,80 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1289.vd1c337fd5354">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2125.vddb_a_44a_d605e"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2125.vddb_a_44a_d605e">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options>
+        <string>skipStagesAfterUnstable</string>
+      </options>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.37.0">
+      <projectUrl>https://github.com/Shikhambryshikha/Jenkinsdemo/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3659.v582dc37621d8">
+    <script>pipeline {
+    agent any
+    options {
+        skipStagesAfterUnstable()
+    }
+    environment{
+        DIRECTORY_PATH=&quot;https://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@github.com/Shikhambryshikha/Jenkinsdemo.git&quot;
+        TESTING_ENVIRONMENT=&quot;test&quot;
+        PRODUCTION_ENVIRONMENT=&quot;Prod&quot;
+    }
+    stages {
+        stage(&apos;Build&apos;) {
+    environment{
+        DIRECTORY_PATH=&quot;https://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@github.com/Shikhambryshikha/Jenkinsdemo.git&quot;
+        TESTING_ENVIRONMENT=&quot;test&quot;
+        PRODUCTION_ENVIRONMENT=&quot;Prod&quot;
+    }
+            steps {
+               echo&apos;fetch the source code from the directory path specified by the environment variable&apos;
+                git url: &quot;https://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@github.com/Shikhambryshikha/Jenkinsdemo.git&quot;,branch: &apos;main&apos;
+                echo&apos;compile the code and generate any necessary artifacts&apos;
+
+
+            }
+        }
+        stage(&apos;Test&apos;){
+            steps {
+                print(&quot;Unit Tests\n&quot;)
+                print(&quot;Integration Tests\n&quot;)
+            }
+        }
+        stage(&apos;CodeQualityCheck&apos;){
+            steps {
+                echo &apos;check the quality of the code&apos;
+            }
+        }
+        stage(&apos;Deploy&apos;) {
+            steps {
+                echo &apos;deploy the application to a testing environment specified by the environment variable&apos;
+            }
+        }
+        stage(&apos;Approval&apos;){
+            steps {
+                sleep 10
+            }
+        }
+        stage(&apos;Deploy To Production&apos;){
+            steps {
+              bat &quot;git push origin main&quot;
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
