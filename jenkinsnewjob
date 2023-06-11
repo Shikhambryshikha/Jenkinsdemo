@@ -1,0 +1,87 @@
+pipeline {
+    agent any
+
+    environment {
+        DIRECTORY_PATH = "\\Users\\Dell\\Desktop"
+        TESTING_ENVIRONMENT = "Testing"
+        PRODUCTION_ENVIRONMENT = "SHIKHAMBRY"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo "Fetch the source code from the directory path specified by the environment variable."
+                echo "Compile the code and generate any necessary artifacts."
+            }
+        }
+
+    stage('Test') {
+            steps {
+                echo "Run unit tests."
+                echo "Run integration tests."
+            }
+          post{
+                success{
+                    emailext attachLog: true,
+                    compressLog: true,
+                    to: "sc9967856@gmail.com",
+                    body: "Testing is finished and build log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+                    subject: "Testing is Successful - Jenkins"
+                }
+                failure {  
+                    emailext attachLog: true,
+                    compressLog: true,
+                    to: "sc9967856@gmail.com",
+                    body: "Testing is finished and Build log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+                    subject: "Testing Failed - Jenkins"  
+                }
+            }
+        }
+
+
+        stage('Code Analysis') {
+            steps {
+                echo "Check the quality of the code."
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                echo "Performing a security scan on the code"
+            }
+            post{
+                success{
+                    emailext attachLog: true,
+                    compressLog: true,
+                    to: "sc9967856@gmail.com",
+                    body: "Security Scan is finished and build log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+                    subject: "Security Scan is Successful - Jenkins"
+                }
+                failure {  
+                    emailext attachLog: true,
+                    compressLog: true,
+                    to: "sc9967856@gmail.com",
+                    body: "Security Scan is finished and Build log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+                    subject: "Security Scan Failed - Jenkins"  
+                }
+            }
+        }
+        stage('Deploy to staging') {
+            steps {
+                echo "Deploying the application to a staging server"
+            }
+        }
+
+        stage('Test on staging') {
+            steps {
+                echo "Run integration tests"
+            }
+        }
+        stage('Deploy to Production') {
+            
+            steps {
+                echo "Deploy the code to the production environment ${PRODUCTION_ENVIRONMENT}."
+            }
+        }
+    }
+}
